@@ -1,101 +1,79 @@
 # BreastCancerDetection-CNN-Transformer
+## Project Overview
+
+This project focuses on improving the automated detection of metastatic breast cancer in lymph node whole slide images (WSIs) using advanced deep learning techniques. We developed and compared two approaches: a traditional Convolutional Neural Network (CNN) combined with Random Forest classification and a novel method using the UNI foundation model with a transformer architecture. Using the CAMELYON16 dataset, we created a comprehensive process that includes patch-level classification, heatmap generation, and slide-level prediction.
+
 ## Usage
 
-The code for the Breast Cancer Detection project using CNN and Transformer models is publicly available on GitHub: [https://github.com/Profjay22/BreastCancerDetection-CNN-Transformer](https://github.com/Profjay22/BreastCancerDetection-CNN-Transformer).
+The code is publicly available on GitHub: [BreastCancerDetection-CNN-Transformer](https://github.com/Profjay22/BreastCancerDetection-CNN-Transformer).
 
 ## Setup
 
-### A.1 Setup on University of St Andrews, School of Computer Science GPUs
+### University of St Andrews, School of Computer Science GPUs
 
-To run the code efficiently, it is recommended to use a Docker container built with the latest PyTorch image. Instructions for setting up Docker can be found on the school's systems wiki: [Docker Setup](https://systems.wiki.cs.st-andrews.ac.uk/index.php/Docker).
+To run the code inside a Docker container built with the latest PyTorch image, follow the instructions for setting up Docker on the [School’s systems wiki](https://systems.wiki.cs.st-andrews.ac.uk/index.php/Docker). Use the `requirements.txt` file included in the source code on GitHub to build the Docker container and install all the necessary Python libraries.
 
-#### Prerequisites
-- Ensure Docker is installed and configured on your system.
-- Clone the repository from GitHub: `git clone https://github.com/Profjay22/BreastCancerDetection-CNN-Transformer.git`
-- Navigate to the project directory: `cd BreastCancerDetection-CNN-Transformer`
+### Data
 
-#### Building the Docker Container
-1. Use the provided `requirements.txt` file to build the Docker container, which will install all necessary Python libraries:
-   ```bash
-   docker build -t breast_cancer_detection -f Dockerfile .
-   ```
-
-#### Data Setup
-- The CAMELYON16 dataset, which is over 700 GB, is not included in the source code. It can be downloaded from [CAMELYON16 Dataset](http://gigadb.org/dataset/100439).
-- Store the downloaded data in a `/data/` folder inside the top-level project directory (outside `src`).
-- Update the paths in the code to point to the new data directory (refer to the README on GitHub for detailed instructions).
+Due to its size (over 700 GB), the CAMELYON16 dataset is not included in the source code. Download the dataset from [GigaDB](http://gigadb.org/dataset/100439) and store it in a `/data/` folder inside the top-level project directory (outside `src`). Update the paths in the code to point to this directory.
 
 ### Running the Code
 
 #### Patch Extraction
-1. Extract patches for the training set:
-   ```bash
-   python src/patch_extraction/wsi_sample.py
-   ```
+1. **Training Set**:
+   - Execute `src/patch_extraction/wsi_sample.py` to extract patches from the training slides.
 
-#### Training
-2. Train the CNN model:
-   ```bash
-   python src/model/updatedtrain.py
-   ```
-3. Run inference on the best CNN model:
-   ```bash
-   python src/model/inference.py
-   ```
-4. Extract the tumor probability heatmap and features:
-   ```bash
-   python src/model/heatmap.py
-   ```
-5. Train the feature vector on the Random Forest classifier with hyperparameter tuning:
-   ```bash
-   python src/postprocessing/train_rf_model.py
-   ```
+#### CNN Training
+1. **Training**:
+   - Run `src/model/updatedtrain.py` to train the CNN model.
+
+2. **Inference**:
+   - Execute `src/model/inference.py` to extract the tumor probability heatmap and features from the trained CNN model.
+
+3. **Post-Processing**:
+   - Run `src/model/heatmap.py` to generate heatmaps from the CNN predictions.
+
+4. **Random Forest Classifier**:
+   - Train the feature vectors using `src/postprocessing/train_rf_model.py`, which includes hyperparameter tuning for the Random Forest classifier.
 
 #### Transformer Training
-6. Extract feature vectors (after patch extraction with `wsi_sample.py`):
-   ```bash
-   python src/unimodel/featureextraction.py
-   ```
-7. Train the transformer model:
-   ```bash
-   python src/transformer_training/main.py
-   ```
-8. Hyperparameter tuning for the transformer:
-   ```bash
-   python src/transformer_training/slide_preprocessor.py
-   python src/transformer_training/hyperparameter_tuning.py
-   ```
-9. Train the model with tuned hyperparameters:
-   ```bash
-   python src/transformer_training/train_hyperparameter_model.py
-   ```
+1. **Feature Extraction**:
+   - Use `src/unimodel/featureextraction.py` to extract feature vectors from the WSIs.
 
-#### Testing
-10. Preprocess to extract patches for the test set:
-    ```bash
-    python src/patch_extraction/wsi_testextract.py
-    ```
-11. Run inference on the saved CNN model with extracted patches:
-    ```bash
-    python src/model/test_inference.py
-    ```
-12. Extract heatmap and feature vectors for classifier inference:
-    ```bash
-    python src/model/test_set_feature_extraction_and_heatmap_generation.py
-    ```
-13. Run inference on the saved best CNN model:
-    ```bash
-    python src/model/test_classify_and_evaluate.py
-    ```
+2. **Transformer Training**:
+   - Train the transformer model using `src/transformer_training/main.py`.
+
+3. **Hyperparameter Tuning**:
+   - Process the features using `src/transformer_training/slide_preprocessor.py` to address I/O bottlenecks.
+   - Execute `src/transformer_training/hyperparameter_tuning.py` to tune hyperparameters for the transformer model.
+
+4. **Training with Tuned Hyperparameters**:
+   - Run `src/transformer_training/train_hyperparameter_model.py` to train the final transformer model with the optimized hyperparameters.
+
+### Testing
+
+#### CNN Testing
+1. **Patch Extraction**:
+   - Execute `src/patch_extraction/wsi_testextract.py` to extract patches from the test slides.
+
+2. **Inference**:
+   - Run `src/model/test_inference.py` to perform inference on the test set using the saved CNN model.
+
+3. **Feature Extraction and Heatmap Generation**:
+   - Execute `src/model/test_set_feature_extraction_and_heatmap_generation.py` to generate heatmaps and extract feature vectors from the test set.
+
+4. **Classification and Evaluation**:
+   - Use `src/model/test_classify_and_evaluate.py` to classify and evaluate the test set predictions.
 
 #### Transformer Testing
-14. Extract feature vectors for the test set:
-    ```bash
-    python src/unimodel/test_featureextraction.py
-    ```
-15. Run inference on the best saved transformer model using the feature vector:
-    ```bash
-    python src/transformer_training/run_test/run_inference.py
-    ```
+1. **Feature Extraction**:
+   - Run `src/unimodel/test_featureextraction.py` to extract feature vectors from the test slides.
 
-Follow these instructions to set up, train, and evaluate the models for the Breast Cancer Detection project. For further details, please refer to the README on GitHub.
+2. **Inference**:
+   - Execute `src/transformer_training/run_test/run_inference.py` to perform inference on the test set using the saved transformer model.
+
+### Additional Scripts and Utilities
+
+Several additional scripts are included in the `src` directory to support various stages of the workflow, including data preprocessing, model training, and evaluation. Ensure that all paths in the scripts are correctly set to point to the appropriate directories and files.
+
+This setup provides a comprehensive guide for running the code to detect metastatic breast cancer in lymph node WSIs using both CNN and transformer-based models. Adjust the paths and parameters as needed to fit your specific environment and dataset.
