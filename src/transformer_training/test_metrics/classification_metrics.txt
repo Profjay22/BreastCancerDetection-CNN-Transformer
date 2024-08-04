@@ -1,0 +1,11 @@
+Metric		Value
+Accuracy		0.8762
+Precision		0.8125
+Recall		0.9070
+F1 Score		0.8571
+
+Class		Precision	Recall	F1-Score	Support
+Benign (class 0)	0.8548	1.0000	0.9217	62
+Malignant (class 1)	0.9070	1.0000	0.9512	43
+Macro Avg	0.8809	1.0000	0.9365	105
+Weighted Avg	0.8125	0.9070	0.8571	105
